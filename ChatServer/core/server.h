@@ -15,13 +15,20 @@ class Server : public QTcpServer
     Q_OBJECT
 
 public:
-    Server(QObject *parent = nullptr);
+    static Server& getInstance() {
+        static Server instance;
+        return instance;
+    }
 protected:
     virtual void incomingConnection(qintptr socketDescriptor) override;
 private slots:
     void onReadyRead();
     void onDisconnected();
 private:
+    Server(QObject *parent = nullptr);
+    Server(Server const&)               = delete;
+    void operator=(Server const&)  = delete;
+
     void handleClientRequest(Connection *client, const QString &request);
     bool isClientAuthorized(Connection *client);
 
@@ -35,7 +42,7 @@ private:
     QList<std::function<bool(Connection *, const QString&)>> _requestHandlers;
     QHash<QString, Connection*> _clients;
 
-    const QRegExp REGEXP_START = QRegExp(QString("^%1(.*)$").arg(Chat::Messages::START));
+    const QRegExp REGEXP_START = QRegExp(QString("^%1(.*)$").arg(Chat::Messages::START));        
 };
 
 #endif // SERVER_H
