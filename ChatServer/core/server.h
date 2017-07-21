@@ -19,6 +19,7 @@ public:
         static Server instance;
         return instance;
     }
+    static const int DEFAULT_PORT = 10000;
 protected:
     virtual void incomingConnection(qintptr socketDescriptor) override;
 private slots:
