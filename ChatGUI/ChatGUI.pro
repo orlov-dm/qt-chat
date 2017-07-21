@@ -13,10 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        ui/mainwindow.cpp \
+    ui/logindialog.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += ui/mainwindow.h \
+    ui/logindialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += ui/mainwindow.ui \
+    ui/logindialog.ui
 
 INCLUDEPATH += "../ChatCommon/"
