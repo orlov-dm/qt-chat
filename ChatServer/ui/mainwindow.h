@@ -2,8 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QString>
+
 
 class Server;
+class QValidator;
 
 namespace Ui {
 class MainWindow;
@@ -23,7 +26,8 @@ private slots:
     void on_pbStopServer_clicked();
 
 private:
-    Ui::MainWindow *ui;    
+    Ui::MainWindow *ui;
+    bool checkConnectInfo(QString &ipString, const QValidator *validator);
 };
 
 #endif // MAINWINDOW_H

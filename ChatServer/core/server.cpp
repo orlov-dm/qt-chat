@@ -1,5 +1,8 @@
 #include "server.h"
 #include "core/connection.h"
+#include "constants.h"
+#include <QDebug>
+
 #include <cassert>
 
 Server::Server(QObject *parent):QTcpServer(parent)
@@ -68,10 +71,17 @@ bool Server::isClientAuthorized(Connection *client)
     return _clients.contains(client->getClientName());
 }
 
-void Server::sendMessage(const QString &message)
+void Server::sendMessage(const QString &message, Connection *client)
 {
-    for(auto client: _clients)
+    if(!client)
+    {
+        for(auto client: _clients)
+            client->write((message + '\n').toUtf8());
+    }
+    else
+    {
         client->write((message + '\n').toUtf8());
+    }
 }
 
 void Server::sendUsersList()
@@ -87,12 +97,20 @@ bool Server::clientJoined(Connection *client, const QString &request)
 {
     assert(client);
     bool handled = false;
-    if(REGEXP_START.indexIn(request) == -1) {
-        const QString clientName = REGEXP_START.cap(1);
-        client->setClientName(clientName);
-        _clients.insert(clientName, client);
-        sendMessage(QString("Server:%1 has joined.\n").arg(clientName));
-        sendUsersList();
+    if(Chat::RegExp::REGEXP_START.indexIn(request) != -1)
+    {
+        const QString clientName = Chat::RegExp::REGEXP_START.cap(1);
+        if(!_clients.contains(clientName))
+        {
+            client->setClientName(clientName);
+            _clients.insert(clientName, client);
+            sendMessage(QString("Server:%1 has joined.\n").arg(clientName));
+            sendUsersList();
+        }
+        else
+        {
+            sendMessage(Chat::Messages::USER_BUSY);
+        }
         handled = true;
     }
     return handled;

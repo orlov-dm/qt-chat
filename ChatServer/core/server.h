@@ -4,8 +4,6 @@
 #include <QtCore/QHash>
 #include <QtCore/QRegExp>
 
-#include <constants.h>
-
 #include <functional>
 
 class Connection;
@@ -18,8 +16,7 @@ public:
     static Server& getInstance() {
         static Server instance;
         return instance;
-    }
-    static const int DEFAULT_PORT = 10000;
+    }    
 protected:
     virtual void incomingConnection(qintptr socketDescriptor) override;
 private slots:
@@ -33,7 +30,7 @@ private:
     void handleClientRequest(Connection *client, const QString &request);
     bool isClientAuthorized(Connection *client);
 
-    void sendMessage(const QString &message);
+    void sendMessage(const QString &message, Connection *client = nullptr);
     void sendUsersList();
 
     //request handlers
@@ -41,9 +38,7 @@ private:
     bool clientSentMessage(Connection *client, const QString &request);
 
     QList<std::function<bool(Connection *, const QString&)>> _requestHandlers;
-    QHash<QString, Connection*> _clients;
-
-    const QRegExp REGEXP_START = QRegExp(QString("^%1(.*)$").arg(Chat::Messages::START));        
+    QHash<QString, Connection*> _clients;         
 };
 
 #endif // SERVER_H
