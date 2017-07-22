@@ -14,10 +14,13 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         ui/mainwindow.cpp \
-    ui/logindialog.cpp
+    ui/logindialog.cpp \
+    core/usersmodel.cpp \
+    ../ChatCommon/common.cpp
 
 HEADERS  += ui/mainwindow.h \
-    ui/logindialog.h
+    ui/logindialog.h \
+    core/usersmodel.h
 
 FORMS    += ui/mainwindow.ui \
     ui/logindialog.ui
