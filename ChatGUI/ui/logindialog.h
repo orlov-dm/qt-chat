@@ -28,6 +28,8 @@ private slots:
     void onSocketError(QAbstractSocket::SocketError);
     void onSocketDisconnected();
     void onSocketReadyRead();
+    void on_pbStop_clicked();
+
 private:
     Ui::LoginDialog *ui;
 
@@ -36,6 +38,7 @@ private:
     void sendMessage(const QString &message);
     bool checkConnectInfo(QString &ipString, const QValidator *validator, const QString &username);
     void startChatWindow(const QString &line);
+    void refreshInfo(bool isConnecting);
 
     const int DEFAULT_PORT = 10000;
 

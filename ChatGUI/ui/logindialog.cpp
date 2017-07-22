@@ -15,13 +15,17 @@ LoginDialog::LoginDialog(QWidget *parent) :
     ui->setupUi(this);
 
     _socket = new QTcpSocket(this);
-    _socket->waitForConnected(5000);
+    const int WAIT_TIME = 5000;
+    _socket->waitForConnected(WAIT_TIME);
+    _socket->waitForDisconnected(WAIT_TIME);
+    _socket->waitForBytesWritten(WAIT_TIME);
+    _socket->waitForReadyRead(WAIT_TIME);
     connect(_socket, &QTcpSocket::connected, this, &LoginDialog::onSocketConnected);    
     connect(_socket, &QTcpSocket::disconnected, this, &LoginDialog::onSocketDisconnected);
     connect(_socket, &QTcpSocket::readyRead, this, &LoginDialog::onSocketReadyRead);
     connect(_socket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(onSocketError(QAbstractSocket::SocketError)));
 
-
+    refreshInfo(false);
 
     ui->leIPAddress->setValidator( Chat::makeIPValidator(ui->leIPAddress) );
 
@@ -73,8 +77,14 @@ void LoginDialog::on_pbConnect_clicked()
         if(ipString == "localhost")
             ipString = "127.0.0.1";
         _socket->connectToHost(ipString, port);
-        ui->pbConnect->setEnabled(false);
-    }
+        refreshInfo(true);
+    }       
+}
+
+void LoginDialog::on_pbStop_clicked()
+{
+    _socket->abort();
+    refreshInfo(false);
 }
 
 void LoginDialog::onSocketConnected()
@@ -92,13 +102,13 @@ void LoginDialog::onSocketError(QAbstractSocket::SocketError error)
     else
         errorMessage = _socketErrors[error];
     QMessageBox::critical(this, tr("Error"), errorMessage);
-    ui->pbConnect->setEnabled(true);
+    refreshInfo(false);
 }
 
 void LoginDialog::onSocketDisconnected()
 {
     qDebug() << "Socket Disconnected";
-    ui->pbConnect->setEnabled(true);
+    refreshInfo(false);
 }
 
 void LoginDialog::onSocketReadyRead()
@@ -156,3 +166,15 @@ void LoginDialog::startChatWindow(const QString &line)
     window->addUnhandledMessage(line);
     window->show();
 }
+
+void LoginDialog::refreshInfo(bool isConnecting)
+{
+    ui->pbConnect->setEnabled(!isConnecting);
+    ui->pbStop->setEnabled(isConnecting);
+    if(isConnecting)
+        ui->lInfo->setText(tr("Trying to connect..."));
+    else
+        ui->lInfo->setText("");
+}
+
+

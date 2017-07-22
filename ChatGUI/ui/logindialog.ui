@@ -91,6 +91,13 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
+      <widget class="QLabel" name="lInfo">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -111,9 +118,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pbExit">
+      <widget class="QPushButton" name="pbStop">
        <property name="text">
-        <string>Exit</string>
+        <string>Stop</string>
        </property>
       </widget>
      </item>
