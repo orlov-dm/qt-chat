@@ -120,6 +120,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pbStopServer">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
