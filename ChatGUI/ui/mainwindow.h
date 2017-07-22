@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+class QTcpSocket;
 
 namespace Ui {
 class MainWindow;
@@ -13,8 +14,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QTcpSocket * serverConnection, QWidget *parent = nullptr);
     ~MainWindow();
+
+    void addUnhandledMessage(const QString &message);
 
 private:
     Ui::MainWindow *ui;
