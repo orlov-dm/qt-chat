@@ -4,6 +4,7 @@
 #include "common.h"
 
 #include <QMessageBox>
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,6 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     ui->leIPAddress->setValidator( Chat::makeIPValidator(ui->leIPAddress) );
+
+    restoreData();
 }
 
 MainWindow::~MainWindow()
@@ -40,6 +43,7 @@ void MainWindow::on_pbStartServer_clicked()
             QMessageBox::information(this, tr("Information"), tr("Server successfully started: %1:%2").arg(ipString).arg(port));
             ui->pbStartServer->setEnabled(false);
             ui->pbStopServer->setEnabled(true);
+            saveData();
         }
         else
         {
@@ -74,4 +78,23 @@ bool MainWindow::checkConnectInfo(QString &ipString, const QValidator *validator
         return false;
     }
     return true;
+}
+
+void MainWindow::saveData()
+{
+    QSettings settings("deo", "Chat Server");
+    settings.setValue(REG_SERVER_ADDR, ui->leIPAddress->text());
+    settings.setValue(REG_SERVER_PORT, ui->sbPort->value());
+}
+
+void MainWindow::restoreData()
+{
+    QSettings settings("deo", "Chat Server");
+    auto addr = settings.value(REG_SERVER_ADDR).toString();
+    if(!addr.isEmpty())
+        ui->leIPAddress->setText(addr);
+    bool ok;
+    auto port = settings.value(REG_SERVER_PORT).toInt(&ok);
+    if(ok)
+        ui->sbPort->setValue(port);
 }

@@ -1,6 +1,6 @@
 #include "server.h"
 #include "core/connection.h"
-#include "constants.h"
+#include "common.h"
 #include <QDebug>
 
 #include <cassert>
@@ -42,8 +42,8 @@ void Server::onDisconnected()
 
     _clients.remove(client->getClientName());
 
-    sendUsersList();
-    sendMessage(QString("Server:%1 has left.").arg(client->getClientName()));
+    sendMessage(Chat::Messages::USER_DISCONNECTED + client->getClientName());
+    sendMessage(tr("%1 has left chat.").arg(client->getClientName()));
 }
 
 void Server::handleClientRequest(Connection *client, const QString &request)
@@ -73,6 +73,7 @@ bool Server::isClientAuthorized(Connection *client)
 
 void Server::sendMessage(const QString &message, Connection *client)
 {
+    qDebug() << message;
     if(!client)
     {
         for(auto client: _clients)
@@ -84,13 +85,14 @@ void Server::sendMessage(const QString &message, Connection *client)
     }
 }
 
-void Server::sendUsersList()
+void Server::sendUsersList(Connection *client)
 {
+    assert(client);
     QStringList clientNames;
     for(auto client: _clients)
         clientNames.append(client->getClientName());
 
-    sendMessage(QString("%1%2").arg(Chat::Messages::USERS).arg(clientNames.join(';')));
+    sendMessage(Chat::Messages::USERS + clientNames.join(';'), client);
 }
 
 bool Server::clientJoined(Connection *client, const QString &request)
@@ -104,12 +106,13 @@ bool Server::clientJoined(Connection *client, const QString &request)
         {
             client->setClientName(clientName);
             _clients.insert(clientName, client);
-            sendMessage(QString("Server:%1 has joined.\n").arg(clientName));
-            sendUsersList();
+            sendUsersList(client);
+            sendMessage(Chat::Messages::USER_JOINED + clientName);
+            sendMessage(tr("%1 has joined chat.").arg(client->getClientName()));
         }
         else
         {
-            sendMessage(Chat::Messages::USER_BUSY);
+            sendMessage(Chat::Messages::USER_BUSY, client);
         }
         handled = true;
     }
@@ -126,7 +129,7 @@ bool Server::clientSentMessage(Connection *client, const QString &request)
         qDebug() << "User:" << client->getClientName();
         qDebug() << "Message:" << message;
 
-        sendMessage(QString("%1:%2").arg(client->getClientName()).arg(message));
+        sendMessage(QString("%1: %2").arg(client->getClientName()).arg(message));
         handled = true;
     }
     return handled;

@@ -28,6 +28,12 @@ private slots:
 private:
     Ui::MainWindow *ui;
     bool checkConnectInfo(QString &ipString, const QValidator *validator);
+
+
+    const QString REG_SERVER_ADDR = "server_addr";
+    const QString REG_SERVER_PORT = "server_port";
+    void saveData();
+    void restoreData();
 };
 
 #endif // MAINWINDOW_H

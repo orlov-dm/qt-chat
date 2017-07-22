@@ -15,7 +15,8 @@ TEMPLATE = app
 SOURCES += main.cpp\
         ui/mainwindow.cpp \
     core/server.cpp \
-    core/connection.cpp
+    core/connection.cpp \
+    ../ChatCommon/common.cpp
 
 HEADERS  += ui/mainwindow.h \
     core/server.h \

@@ -31,7 +31,7 @@ private:
     bool isClientAuthorized(Connection *client);
 
     void sendMessage(const QString &message, Connection *client = nullptr);
-    void sendUsersList();
+    void sendUsersList(Connection *client);
 
     //request handlers
     bool clientJoined(Connection *client, const QString &request);
