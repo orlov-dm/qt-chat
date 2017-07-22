@@ -2,19 +2,31 @@
 #define COMMON_H
 
 #include <QString>
+#include <QRegExp>
+#include <QRegExpValidator>
 
 namespace Chat {
-    const int DEFAULT_PORT = 10000;
-    QRegExpValidator *makeIPValidator(QObject *parent)
-    {
-        const QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
-        const QRegExp ipRegex (QString("^(%1\\.%2\\.%3\\.%4)|localhost$").arg(ipRange, ipRange, ipRange, ipRange));
+    const int DEFAULT_PORT = 20000;
+    QRegExpValidator *makeIPValidator(QObject *parent);
 
-        return new QRegExpValidator(ipRegex, parent);
+    namespace Messages {
+        const QString START = "/start:";
+        const QString USERS = "/users:";
+        const QString USER_BUSY = "/user-busy:";
+        const QString USER_JOINED = "/user-join:";
+        const QString USER_DISCONNECTED = "/user-out:";
+    }
+
+    namespace RegExp {
+        QRegExp makeRegExp(const QString &message);
+
+        const QRegExp REGEXP_START = makeRegExp(Chat::Messages::START);
+        const QRegExp REGEXP_USERS = makeRegExp(Chat::Messages::USERS);
+        const QRegExp REGEXP_USER_BUSY = makeRegExp(Chat::Messages::USER_BUSY);
+        const QRegExp REGEXP_USER_JOINED = makeRegExp(Chat::Messages::USER_JOINED);
+        const QRegExp REGEXP_USER_DISCONNECTED = makeRegExp(Chat::Messages::USER_DISCONNECTED);
     }
 }
-
-
 
 
 
