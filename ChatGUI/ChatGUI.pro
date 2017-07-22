@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,10 +13,16 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        ui/mainwindow.cpp \
+    ui/logindialog.cpp \
+    core/usersmodel.cpp \
+    ../ChatCommon/common.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += ui/mainwindow.h \
+    ui/logindialog.h \
+    core/usersmodel.h
 
-FORMS    += mainwindow.ui
+FORMS    += ui/mainwindow.ui \
+    ui/logindialog.ui
 
 INCLUDEPATH += "../ChatCommon/"

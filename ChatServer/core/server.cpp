@@ -1,5 +1,8 @@
 #include "server.h"
 #include "core/connection.h"
+#include "common.h"
+#include <QDebug>
+
 #include <cassert>
 
 Server::Server(QObject *parent):QTcpServer(parent)
@@ -39,8 +42,8 @@ void Server::onDisconnected()
 
     _clients.remove(client->getClientName());
 
-    sendUsersList();
-    sendMessage(QString("Server:%1 has left.").arg(client->getClientName()));
+    sendMessage(Chat::Messages::USER_DISCONNECTED + client->getClientName());
+    sendMessage(tr("%1 has left chat.").arg(client->getClientName()));
 }
 
 void Server::handleClientRequest(Connection *client, const QString &request)
@@ -68,31 +71,49 @@ bool Server::isClientAuthorized(Connection *client)
     return _clients.contains(client->getClientName());
 }
 
-void Server::sendMessage(const QString &message)
+void Server::sendMessage(const QString &message, Connection *client)
 {
-    for(auto client: _clients)
+    qDebug() << message;
+    if(!client)
+    {
+        for(auto client: _clients)
+            client->write((message + '\n').toUtf8());
+    }
+    else
+    {
         client->write((message + '\n').toUtf8());
+    }
 }
 
-void Server::sendUsersList()
+void Server::sendUsersList(Connection *client)
 {
+    assert(client);
     QStringList clientNames;
     for(auto client: _clients)
         clientNames.append(client->getClientName());
 
-    sendMessage(QString("%1%2").arg(Chat::Messages::USERS).arg(clientNames.join(';')));
+    sendMessage(Chat::Messages::USERS + clientNames.join(';'), client);
 }
 
 bool Server::clientJoined(Connection *client, const QString &request)
 {
     assert(client);
     bool handled = false;
-    if(REGEXP_START.indexIn(request) == -1) {
-        const QString clientName = REGEXP_START.cap(1);
-        client->setClientName(clientName);
-        _clients.insert(clientName, client);
-        sendMessage(QString("Server:%1 has joined.\n").arg(clientName));
-        sendUsersList();
+    if(Chat::RegExp::REGEXP_START.indexIn(request) != -1)
+    {
+        const QString clientName = Chat::RegExp::REGEXP_START.cap(1);
+        if(!_clients.contains(clientName))
+        {
+            client->setClientName(clientName);
+            _clients.insert(clientName, client);
+            sendUsersList(client);
+            sendMessage(Chat::Messages::USER_JOINED + clientName);
+            sendMessage(tr("%1 has joined chat.").arg(client->getClientName()));
+        }
+        else
+        {
+            sendMessage(Chat::Messages::USER_BUSY, client);
+        }
         handled = true;
     }
     return handled;
@@ -108,7 +129,7 @@ bool Server::clientSentMessage(Connection *client, const QString &request)
         qDebug() << "User:" << client->getClientName();
         qDebug() << "Message:" << message;
 
-        sendMessage(QString("%1:%2").arg(client->getClientName()).arg(message));
+        sendMessage(QString("%1: %2").arg(client->getClientName()).arg(message));
         handled = true;
     }
     return handled;
